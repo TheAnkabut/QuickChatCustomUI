@@ -63,6 +63,23 @@ namespace QuickChatPanel
         ImGui::EndChild();
         ImGui::EndChild();
         
+        static std::string lastMessage[20];
+        for (int s = 0; s < 20 && s < (int)bindings.size(); s++)
+        {
+            const std::string& msg = bindings[s].message;
+            if (lastMessage[s] != msg)
+            {
+                auto& sl = Settings::quickChatSlots[s];
+                sl.customText[0] = '\0';
+                if (!msg.empty())
+                {
+                    strncpy(sl.customText, msg.c_str(), sizeof(sl.customText) - 1);
+                    sl.customText[sizeof(sl.customText) - 1] = '\0';
+                }
+                lastMessage[s] = msg;
+            }
+        }
+
         // Right panel: slot properties
         ImGui::SetCursorScreenPos(ImVec2(startPos.x + splitterWidth + 8 + 7, startPos.y));
         ImGui::BeginChild("##QCRightPanel", ImVec2(rightWidth, PANEL_HEIGHT), false);
@@ -80,22 +97,6 @@ namespace QuickChatPanel
             {
                 strncpy(slot.customText, message.c_str(), sizeof(slot.customText) - 1);
                 slot.customText[sizeof(slot.customText) - 1] = '\0';
-            }
-
-            // If binding changed, clear custom text so it picks up the new one
-            static std::string lastMessage[20];
-            if (lastMessage[Settings::selectedQCSlotIndex] != message)
-            {
-                if (!lastMessage[Settings::selectedQCSlotIndex].empty())
-                {
-                    slot.customText[0] = '\0';
-                    if (!message.empty())
-                    {
-                        strncpy(slot.customText, message.c_str(), sizeof(slot.customText) - 1);
-                        slot.customText[sizeof(slot.customText) - 1] = '\0';
-                    }
-                }
-                lastMessage[Settings::selectedQCSlotIndex] = message;
             }
             
             // Custom text input - shows actual text

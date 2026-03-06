@@ -30,6 +30,16 @@ namespace Presets
 
         // Wire QuickChatConfig -> Presets: auto-save when bindings update from game memory
         QuickChatConfig::SetOnBindingsUpdated([]() {
+            static std::string prevBindings[20];
+            const auto& bindings = QuickChatConfig::GetBindings();
+            for (int i = 0; i < 20; i++)
+            {
+                if (!prevBindings[i].empty() && prevBindings[i] != bindings[i].message)
+                {
+                    Settings::quickChatSlots[i].customText[0] = '\0';
+                }
+                prevBindings[i] = bindings[i].message;
+            }
             SaveUserConfig();
         });
 
@@ -326,7 +336,6 @@ namespace Presets
         for (const auto& slot : Settings::quickChatSlots)
         {
             nlohmann::json slotJson;
-            slotJson["customText"] = slot.customText;
             slotJson["fontName"] = slot.fontName;
             slotJson["fontSize"] = slot.fontSize;
             slotJson["offsetX"] = slot.offsetX;
@@ -484,9 +493,7 @@ namespace Presets
 
                 auto& slot = Settings::quickChatSlots[index];
 
-                std::string customStr = slotJson.value("customText", "");
-                strncpy(slot.customText, customStr.c_str(), sizeof(slot.customText) - 1);
-                slot.customText[sizeof(slot.customText) - 1] = '\0';
+
 
                 slot.fontName = slotJson.value("fontName", "Bourgeois Medium");
                 slot.fontSize = slotJson.value("fontSize", 32.0f);
