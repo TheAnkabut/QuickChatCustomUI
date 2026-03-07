@@ -15,7 +15,7 @@ namespace QuickChatPanel
     static float splitterWidth = 180.0f;
     static constexpr float PANEL_HEIGHT = 220.0f;
     static int currentGroupIndex = 0;
-    static bool syncGroup = false;
+    static bool syncGroup = true;
 
     void Render()
     {

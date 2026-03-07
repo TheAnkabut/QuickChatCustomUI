@@ -33,7 +33,7 @@ namespace Settings
     int selectedQCSlotIndex = 0;
     int activeQCGroup = -1;
     int boldSlotIndex = -1;
-    bool enabledGroups[5] = {false, false, false, false, false};
+    bool enabledGroups[5] = {true, true, true, true, true};
     
     void SetActiveQCGroup(int group)
     {

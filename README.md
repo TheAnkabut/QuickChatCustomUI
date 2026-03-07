@@ -2,6 +2,8 @@
 
 Replace Rocket League's default Quick Chat wheel with your own customizable overlay.
 
+![Banner](images/QCCUIBanner.jpg)
+
 ![Preview](images/image.png)
 
 ## Features

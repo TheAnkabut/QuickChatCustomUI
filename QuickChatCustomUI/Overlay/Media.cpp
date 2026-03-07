@@ -7,6 +7,7 @@
 #include <fstream>
 #include <map>
 
+// stb_image.h was modified to fix two_back ptr (stbi__load_gif_main)
 #define STB_IMAGE_IMPLEMENTATION
 #include "../Utils/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -164,22 +165,26 @@ namespace Media
             return;
         }
 
+        // Mark as in-progress to prevent duplicate loads
         auto gifData = std::make_shared<GifData>();
         gifCache[framesDir] = gifData;
 
-        for (int i = 0; ; i++)
-        {
-            std::string framePath = framesDir + "\\frame_" + std::to_string(i) + ".png";
-            if (!std::filesystem::exists(framePath))
+        std::string framesDirCopy = framesDir;
+        gameWrapper->SetTimeout([framesDirCopy, gifData](GameWrapper*) {
+            for (int i = 0; ; i++)
             {
-                break;
+                std::string framePath = framesDirCopy + "\\frame_" + std::to_string(i) + ".png";
+                if (!std::filesystem::exists(framePath))
+                {
+                    break;
+                }
+
+                gifData->frames.push_back(std::make_shared<ImageWrapper>(framePath, true, true));
+                gifData->durations.push_back(0.05f);
             }
 
-            gifData->frames.push_back(std::make_shared<ImageWrapper>(framePath, true, true));
-            gifData->durations.push_back(0.05f);
-        }
-
-        gifData->loaded = !gifData->frames.empty();
+            gifData->loaded = !gifData->frames.empty();
+        }, 0.01f);
     }
 
     // ==================== Rendering ====================
